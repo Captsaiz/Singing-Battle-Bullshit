@@ -2,6 +2,7 @@
 #include <string>
 #include <cctype>
 #include <filesystem>
+#include <vector>
 
 namespace fs = std::filesystem;
 
@@ -31,6 +32,8 @@ void cleanStr(std::string& msg) {
 
 int main() {
 	std::string usrInp;
+	std::vector<std::string> listSongs;
+	std::string slct_song;
 
   fs::path targetdir("./Songs-Asset");
 	if (!fs::exists(targetdir) || !fs::is_directory(targetdir)) {
@@ -38,18 +41,49 @@ int main() {
 			return 1;
 	}
 
-	std::cout << "Welcome to Singing-Battle-Bullshit!!!\n\n"; 
-	std::cout << "Please select a song:\n";
+	std::cout << "Welcome to Singing-Battle-Bullshit!!!\n"; 
 
 	for (const auto& entry : fs::directory_iterator(targetdir)) {
 		if (entry.is_regular_file()) {
-			std::cout << "\u00B7 " << entry.path().stem().string() << '\n';
+			listSongs.push_back(entry.path().stem().string());
 		}
 	}
 
-	usrInp = getUSrInp();
-	cleanStr(usrInp);
-	std::cout << usrInp << '\n';
+	while (true) {
+		usrInp = "";
+		slct_song = "";
 
+		std::cout << '\n';
+		std::cout << "Please select a song:\n";
+
+		for (size_t i = 0; i < listSongs.size(); ++i) {
+			std::cout << "\u00B7 " << listSongs[i] << '\n';
+		}
+
+		std::cout << '\n';
+
+		usrInp = getUSrInp();
+		cleanStr(usrInp);
+		
+		for (size_t pointer = 0; pointer < listSongs.size(); ++pointer) {
+			std::string cmp_listSongs = listSongs[pointer];
+			cleanStr(cmp_listSongs);
+
+			if (!(usrInp == cmp_listSongs)) continue;;
+
+			slct_song = listSongs[pointer];
+			break;
+		}
+
+		if (slct_song.empty()) {
+			errorMsg("No song file found!");
+			continue;
+		}
+
+		std::cout << '\n'; // DEBUG
+		std::cout << slct_song << '\n'; // DEBUG
+		std::cout << "YEY\n"; // DEBUG
+	}
+	
 	return 0;
 }

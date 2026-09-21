@@ -6,5 +6,5 @@ std::vector<std::string> GG_EZ = {
   "Hey don't say that",
   "Ehe really? Fucking EZ",
   "Log in, new skin",
-
+  
 };
