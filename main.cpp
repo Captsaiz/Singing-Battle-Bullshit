@@ -30,6 +30,28 @@ void cleanStr(std::string& msg) {
   }
 }
 
+std::string frmtSngNme_str(std::string& sngNme) {
+	if (sngNme.empty()) return sngNme;
+
+	while (true) {
+		static size_t actPos = sngNme.length() + 1; // first loop, makes sure actPos won't mistakenly get matched
+
+		size_t pos = sngNme.find_first_of(" .,-");
+		if (pos == std::string::npos) break;
+
+		if (pos == actPos + 1) { sngNme.erase(pos, 1); continue; }
+		
+		sngNme.replace(pos, 1, "_");
+		actPos = pos;
+	}
+
+	for (char& c : sngNme) {
+  c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+  }
+
+	return sngNme;
+}
+
 int main() {
 	std::string usrInp;
 	std::vector<std::string> listSongs;
@@ -63,13 +85,14 @@ int main() {
 		std::cout << '\n';
 
 		usrInp = getUSrInp();
+		std::cout << frmtSngNme_str(usrInp) << '\n'; // DEBUG
 		cleanStr(usrInp);
 		
 		for (size_t pointer = 0; pointer < listSongs.size(); ++pointer) {
 			std::string cmp_listSongs = listSongs[pointer];
 			cleanStr(cmp_listSongs);
 
-			if (!(usrInp == cmp_listSongs)) continue;;
+			if (!(usrInp == cmp_listSongs)) continue;
 
 			slct_song = listSongs[pointer];
 			break;
@@ -80,9 +103,7 @@ int main() {
 			continue;
 		}
 
-		std::cout << '\n'; // DEBUG
-		std::cout << slct_song << '\n'; // DEBUG
-		std::cout << "YEY\n"; // DEBUG
+		
 	}
 	
 	return 0;
