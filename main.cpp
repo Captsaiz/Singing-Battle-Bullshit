@@ -3,8 +3,9 @@
 #include <cctype>
 #include <filesystem>
 #include <vector>
+#include <fstream>
 
-namespace fs = std::filesystem;
+namespace fs = std::filesystem;                              
 
 void errorMsg(const std::string& error) {
 	std::cerr << "ERROR: " << error << '\n';
