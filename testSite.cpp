@@ -19,22 +19,27 @@ void creatAlbum() {
     std::string unformattedLyric;
 
     fs::path targetdir("./Songs-Asset");
+    std::ifstream filePath("");
 
     for (const auto& entry : fs::directory_iterator(targetdir)) {
         if (entry.is_regular_file()) {
-            songNames.push_back(entry.path().stem();
+            std::ifstream filePath(entry.path().string());
+            // format to unformatted lyric
+            // BUAT DOCUMENTATION/PSEUDOCODE WOY!!!!!!!!!!!
+
+            songNames.push_back(entry.path().stem().string());
+            
         }
     }
 
     album.clear();
     album.resize(songNames.size());
     for (size_t i = 0; i < songNames.size(); ++i) {
-        album[i] = Song mySong;
         album[i].name = songNames[i];
     }
 
     for (const auto& song : album) {
-        std::cout << song << '\n';
+        std::cout << '\n';
     }
 
     // unformattedLyric = std::string(std::istreambuf_iterator<char>("./M.Sasuse - GG EZ"), std::istreambuf_iterator<char>());
