@@ -16,35 +16,44 @@ std::vector<Song> album;
 
 void creatAlbum() {
     std::vector<std::string> songNames;
-    std::string unformattedLyric;
+    std::vector<std::string> songLyric;
 
     fs::path targetdir("./Songs-Asset");
     std::ifstream filePath("");
 
     for (const auto& entry : fs::directory_iterator(targetdir)) {
+        
         if (entry.is_regular_file()) {
-            std::ifstream filePath(entry.path().string());
-            // format to unformatted lyric
-            // BUAT DOCUMENTATION/PSEUDOCODE WOY!!!!!!!!!!!
+            std::ifstream filePath(entry.path());
+            std::string adaptorLyric((std::istreambuf_iterator<char>(filePath)), std::istreambuf_iterator<char>());
 
             songNames.push_back(entry.path().stem().string());
-            
+            songLyric.push_back(adaptorLyric);
         }
     }
 
     album.clear();
     album.resize(songNames.size());
-    for (size_t i = 0; i < songNames.size(); ++i) {
+    for (size_t i = 0; i < album.size(); ++i) {
         album[i].name = songNames[i];
+
+        if (album[i].lyric.empty()) album[i].lyric.push_back("");
+        size_t j = 0;
+        for (std::string::iterator it = songLyric[i].begin(); it != songLyric[i].end(); ++it) {
+            if (*it != '\n') { album[i].lyric[j] += *it; continue; }
+            
+            album[i].lyric.push_back("");
+            ++j;
+        }
     }
 
-    for (const auto& song : album) {
-        std::cout << '\n';
+    std::cout << album[0].name << '\n'; // DEBUG
+
+    for (size_t i = 0; i < album[0].lyric.size(); ++i) { // DEBUG
+        std::cout << album[0].lyric[i] << '\n';
     }
 
-    // unformattedLyric = std::string(std::istreambuf_iterator<char>("./M.Sasuse - GG EZ"), std::istreambuf_iterator<char>());
-    // std::cout << unformattedLyric << '\n';
-
+    // TODO: clean and put this in main.cpp
 }
 
 int main() {
