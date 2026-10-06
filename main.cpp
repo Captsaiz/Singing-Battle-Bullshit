@@ -164,9 +164,7 @@ std::string formatSongName(std::string& songName) {
 		actionedPos = pos;
 	}
 
-	for (char& c : songName) {
-  c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
-  }
+	upperCase(songName);
 
 	return songName;
 }
