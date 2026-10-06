@@ -19,19 +19,19 @@ void upperCase(std::string& text) {
     }
 }
 
-std::string formatSongName(std::string& songName) {
+std::string formatSongName(std::string songName) {
 	if (songName.empty()) return songName;
 
 	while (true) {
-		static size_t actPos = songName.length() + 1; // first loop, makes sure actPos won't mistakenly get matched
+		static size_t actionedPosition = songName.length() + 1; // first loop, makes sure actionedPosition won't mistakenly get matched
 
 		size_t pos = songName.find_first_of(" .,-");
 		if (pos == std::string::npos) break;
 
-		if (pos == actPos + 1) { songName.erase(pos, 1); continue; }
+		if (pos == actionedPosition + 1) { songName.erase(pos, 1); continue; }
 		
 		songName.replace(pos, 1, "_");
-		actPos = pos;
+        actionedPosition = pos;
 	}
 
     upperCase(songName);
