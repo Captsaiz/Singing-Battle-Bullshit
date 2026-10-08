@@ -1,4 +1,4 @@
-#include <iostream> // TODO: Fix the declaration expected bug in selectAlbumIndex() adn contineu aking the singing battle program
+#include <iostream> // TODO: continue on the inging function now
 #include <string>
 #include <cctype>
 #include <filesystem>
@@ -19,7 +19,7 @@ std::vector<Song> album;
 bool creatAlbum(const std::string& folderPath);
 size_t selectAlbumIndex();
 
-std::string formatSongName(std::string& songName);
+std::string formatSongName(std::string songName);
 void upperCase(std::string& text);
 bool isNumberOnly(const std::string& text);
 std::string getInput();
@@ -48,31 +48,29 @@ int main() {
 	std::cout << "Welcome to Singing-Battle-Bullshit!!!\n"; 
 
 	size_t selectedIndex = selectAlbumIndex();
-	std::cout << selectAlbumIndex << '\n'; // DEBUG
 
-		std::cout << '\n';
+		// std::cout << '\n';
 
-		usrInp = getUSrInp();
-		std::cout << frmtsongName_str(usrInp) << '\n'; // DEBUG
-		cleanStr(usrInp);
+		// usrInp = getUSrInp();
+		// std::cout << frmtsongName_str(usrInp) << '\n'; // DEBUG
+		// cleanStr(usrInp);
 		
-		for (size_t pointer = 0; pointer < listSongs.size(); ++pointer) {
-			std::string cmp_listSongs = listSongs[pointer];
-			cleanStr(cmp_listSongs);
+		// for (size_t pointer = 0; pointer < listSongs.size(); ++pointer) {
+		// 	std::string cmp_listSongs = listSongs[pointer];
+		// 	cleanStr(cmp_listSongs);
 
-			if (!(usrInp == cmp_listSongs)) continue;
+		// 	if (!(usrInp == cmp_listSongs)) continue;
 
-			slct_song = listSongs[pointer];
-			break;
-		}
+		// 	slct_song = listSongs[pointer];
+		// 	break;
+		// }
 
-		if (slct_song.empty()) {
-			errorMsg("No song file found!");
-			continue;
-		}
+		// if (slct_song.empty()) {
+		// 	errorMsg("No song file found!");
+		// 	continue;
+		// }
 
 		
-	}
 	
 	return 0;
 }
@@ -125,7 +123,7 @@ bool creatAlbum(const std::string& folderPath) {
 size_t selectAlbumIndex() {
 	while (true) {
 		std::cout << "Please select a song:\n";
-		for (size_t i = 0; i < album.size(); ++i) std::cout << i << ". " <<  album[i].name << '\n';
+		for (size_t i = 0; i < album.size(); ++i) std::cout << (i + 1) << ". " <<  album[i].name << '\n';
 
 		std::string input = getInput();
 		std::string formattedInput = formatSongName(input);
@@ -149,8 +147,34 @@ size_t selectAlbumIndex() {
 	}
 }
 
-std::string formatSongName(std::string& songName) {
+std::string formatSongName(std::string songName) {
 	if (songName.empty()) return songName;
+
+	for (char& c : songName) {
+		if (c == '\n' || c == '\t' || c == '\r') c = ' ';
+	}
+
+	bool isSpaceFilledBeggining = (songName.front() == ' ');
+
+	if (isSpaceFilledBeggining) { // Erase trailing spaces at the beggining
+		size_t notSpace = songName.find_first_not_of(' ');
+		
+		if (notSpace != std::string::npos) songName.erase(0, notSpace);
+		else {
+			songName.clear();
+			return songName;
+		}
+	}
+
+	bool isSpaceFilledEnd = (songName.back() == ' ');
+
+	if (isSpaceFilledEnd) { // Erase trailing spacex at the end
+		size_t lastNonSpace = songName.find_last_not_of(' ');
+		size_t lastSpaceTrail = songName.find_last_of(' ');
+		if (lastNonSpace != std::string::npos && lastSpaceTrail != std::string::npos && lastSpaceTrail > lastNonSpace) {
+			songName.erase(lastNonSpace + 1, lastSpaceTrail - lastNonSpace);
+		} 
+	}
 
 	while (true) {
 		static size_t actionedPos = songName.length() + 1; // first loop, makes sure actionedPos won't mistakenly get matched
