@@ -6,6 +6,9 @@
 #include <fstream>
 #include <cstdlib> // EXIT_FAILURE
 #include <algorithm>
+#include <thread>
+#include <chrono>
+
 
 namespace fs = std::filesystem;                              
 
@@ -16,62 +19,33 @@ struct Song {
 
 std::vector<Song> album;
 
+
 bool creatAlbum(const std::string& folderPath);
 size_t selectAlbumIndex();
+void startSingingBattle(const size_t& albumIndex);
 
 std::string formatSongName(std::string songName);
+std::string formatLyric(std::string& text);
+void cleanUnwantedChar(std::string& text);
 void upperCase(std::string& text);
 bool isNumberOnly(const std::string& text);
 std::string getInput();
 void errorMessage(const std::string& error);
 
 
-
-
-void cleanStr(std::string& text) {
-	if (text.empty()) return;
+int main() {
 
 	while (true) {
-		size_t index = text.find_first_of(".,'");
-		if (index == std::string::npos) break;
-		text.erase(index, 1);
+		if (!creatAlbum("./Songs-Asset")) return EXIT_FAILURE;
+
+		std::cout << '\n';
+		std::cout << "Welcome to Singing-Battle-Bullshit!!!\n"; 
+
+		startSingingBattle(selectAlbumIndex());
+
+		std::this_thread::sleep_for(std::chrono::seconds(3));
 	}
 
-  upperCase(text);
-}
-
-
-
-int main() {
-	if (!creatAlbum("./Songs-Asset")) return EXIT_FAILURE;
-
-	std::cout << "Welcome to Singing-Battle-Bullshit!!!\n"; 
-
-	size_t selectedIndex = selectAlbumIndex();
-
-		// std::cout << '\n';
-
-		// usrInp = getUSrInp();
-		// std::cout << frmtsongName_str(usrInp) << '\n'; // DEBUG
-		// cleanStr(usrInp);
-		
-		// for (size_t pointer = 0; pointer < listSongs.size(); ++pointer) {
-		// 	std::string cmp_listSongs = listSongs[pointer];
-		// 	cleanStr(cmp_listSongs);
-
-		// 	if (!(usrInp == cmp_listSongs)) continue;
-
-		// 	slct_song = listSongs[pointer];
-		// 	break;
-		// }
-
-		// if (slct_song.empty()) {
-		// 	errorMsg("No song file found!");
-		// 	continue;
-		// }
-
-		
-	
 	return 0;
 }
 
@@ -147,50 +121,114 @@ size_t selectAlbumIndex() {
 	}
 }
 
+void startSingingBattle(const size_t& albumIndex) {
+	std::vector<std::string> enemyLyrics;
+	std::vector<std::string> playerLyrics;
+
+	for (size_t i = 0; i < album[albumIndex].lyric.size(); ++i) {
+		if (i % 2 == 0) enemyLyrics.push_back(album[albumIndex].lyric[i]);
+		else playerLyrics.push_back(formatLyric(album[albumIndex].lyric[i]));
+	}
+
+	bool playerWon;
+	std::string playerInput;
+
+	for (size_t i = 0; i < enemyLyrics.size(); ++i) {
+		std::cout << enemyLyrics[i] << '\n';
+
+		if (!(i < playerLyrics.size())) { playerWon = true; break; }
+
+		playerInput = getInput();
+		playerInput = formatLyric(playerInput);
+
+		if (playerInput != playerLyrics[i]) { playerWon = false; break; }
+
+		if (i == playerLyrics.size() - 1) { playerWon = true; break; }
+
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+	}
+
+	std::cout << '\n';
+
+	if (playerWon) {
+		
+		std::cout << "Wow amazing\n";
+		std::cout << "You won :D\n";
+		return;
+	}
+
+	std::cout << "Beep boom fuck uo wrong lyric\n";
+	std::cout << "Try again :(\n";
+}
+
 std::string formatSongName(std::string songName) {
 	if (songName.empty()) return songName;
 
-	for (char& c : songName) {
-		if (c == '\n' || c == '\t' || c == '\r') c = ' ';
-	}
-
-	bool isSpaceFilledBeggining = (songName.front() == ' ');
-
-	if (isSpaceFilledBeggining) { // Erase trailing spaces at the beggining
-		size_t notSpace = songName.find_first_not_of(' ');
+	cleanUnwantedChar(songName);
 		
-		if (notSpace != std::string::npos) songName.erase(0, notSpace);
-		else {
-			songName.clear();
-			return songName;
+	bool lastWasSeperator = false;
+
+	auto it = std::remove_if(songName.begin(), songName.end(), [&](char& c) {
+		if (c == ' ' || c == '.' || c == ',' || c == '-' || c == '\'') {
+
+			if (lastWasSeperator) return true;
+
+			c = '_';
+			lastWasSeperator = true;
+			return false;
 		}
-	}
 
-	bool isSpaceFilledEnd = (songName.back() == ' ');
+		lastWasSeperator = false;
+		return false;
+	});
 
-	if (isSpaceFilledEnd) { // Erase trailing spacex at the end
-		size_t lastNonSpace = songName.find_last_not_of(' ');
-		size_t lastSpaceTrail = songName.find_last_of(' ');
-		if (lastNonSpace != std::string::npos && lastSpaceTrail != std::string::npos && lastSpaceTrail > lastNonSpace) {
-			songName.erase(lastNonSpace + 1, lastSpaceTrail - lastNonSpace);
-		} 
-	}
-
-	while (true) {
-		static size_t actionedPos = songName.length() + 1; // first loop, makes sure actionedPos won't mistakenly get matched
-
-		size_t pos = songName.find_first_of(" .,-");
-		if (pos == std::string::npos) break;
-
-		if (pos == actionedPos + 1) { songName.erase(pos, 1); continue; }
-		
-		songName.replace(pos, 1, "_");
-		actionedPos = pos;
-	}
+	songName.erase(it, songName.end());
 
 	upperCase(songName);
 
 	return songName;
+}
+
+std::string formatLyric(std::string& text) {
+	if (text.empty()) return text;
+
+	cleanUnwantedChar(text);
+
+	text.erase(std::remove_if(text.begin(), text.end(), [](char c) {
+		return c == '.' || c == ',' || c == '\'';
+	}), text.end());
+
+  upperCase(text);
+
+	return text;
+}
+
+void cleanUnwantedChar(std::string& text) {
+	for (char& c : text) {
+		if (c == '\n' || c == '\t' || c == '\r') c = ' ';
+	}
+
+	bool isSpaceFilledBeggining = (text.front() == ' ');
+
+	if (isSpaceFilledBeggining) { // Erase trailing spaces at the beggining
+		size_t notSpace = text.find_first_not_of(' ');
+		
+		if (notSpace != std::string::npos) text.erase(0, notSpace);
+		else {
+			text.clear();
+			return;
+		}
+	}
+
+	bool isSpaceFilledEnd = (text.back() == ' ');
+
+	if (isSpaceFilledEnd) { // Erase trailing spaces at the end
+		size_t lastNonSpace = text.find_last_not_of(' ');
+		size_t lastSpaceTrail = text.find_last_of(' ');
+		if (lastNonSpace != std::string::npos && lastSpaceTrail != std::string::npos && lastSpaceTrail > lastNonSpace) {
+			text.erase(lastNonSpace + 1, lastSpaceTrail - lastNonSpace);
+		}  
+	}
 }
 
 void upperCase(std::string& text) {
