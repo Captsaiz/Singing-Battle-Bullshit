@@ -101,6 +101,7 @@ size_t selectAlbumIndex() {
 
 		std::string input = getInput();
 		std::string formattedInput = formatSongName(input);
+		std::cout << '\n'; // DEBUG
 
 		if (formattedInput.empty()) { errorMessage("Please enter a valid input"); continue;}
 
@@ -133,6 +134,15 @@ void startSingingBattle(const size_t& albumIndex) {
 	bool playerWon;
 	std::string playerInput;
 
+	std::cout << "You\'ve chosen: " << album[albumIndex].name << '\n'; // 3 2 1 starting sequence
+	std::this_thread::sleep_for(std::chrono::seconds(2));
+	std::cout << "Startin in \n";
+	for (int count = 3; count != 0; --count) {
+		std::cout << count << '\n';
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+	}
+	std::cout << '\n';
+
 	for (size_t i = 0; i < enemyLyrics.size(); ++i) {
 		std::cout << enemyLyrics[i] << '\n';
 
@@ -157,7 +167,7 @@ void startSingingBattle(const size_t& albumIndex) {
 		return;
 	}
 
-	std::cout << "Beep boom fuck uo wrong lyric\n";
+	std::cout << "Beep boom fuck u wrong lyric\n";
 	std::cout << "Try again :(\n";
 }
 
